@@ -1,118 +1,156 @@
 import React from 'react'
-import Layout from '~/shared/layout'
-import Form from '~/components/form'
 import {
+	Link as RouterLink
+} from 'react-router-dom'
+
+import {
+	useColorModeValue as mode,
+	FormControl,
+	FormErrorMessage,
+	FormLabel, Stack,
+	Box,
+	Input,
+	Checkbox,
+	Button,
+	Text,
+	Heading,
 	Link
-} from 'react-router-dom';
+} from '@chakra-ui/react'
+import { useForm, useField } from 'react-final-form-hooks'
 import SIGN_UP_MUTATION from '~/api/mutations/sign-up.gql'
 import { useMutation } from '@apollo/client'
 import { useHistory } from 'react-router-dom'
 import Error from '~/components/error'
-import Loading from '~/components/loading'
+
+enum FormErrors {
+	FIELD_REQUIRED = "Required",
+	INVALID_EMAIL = "Invalid Email",
+	PASSWORD_SHOULD_MATCH = "Passwords should match"
+}
+
+interface ValidationErrors {
+	email?: FormErrors.FIELD_REQUIRED | FormErrors.INVALID_EMAIL
+	password?: FormErrors.FIELD_REQUIRED
+	passwordConfirmation?: FormErrors.FIELD_REQUIRED | FormErrors.PASSWORD_SHOULD_MATCH
+}
 
 export default () => {
-	const [sign_up, { error, loading, data }] = useMutation(SIGN_UP_MUTATION)
+	const [sign_up, { error, loading: isLoading, data }] = useMutation(SIGN_UP_MUTATION)
 	const history = useHistory()
-	const [email, setEmail] = React.useState<string>("")
-	const [password, setPassword] = React.useState<string>("")
-	const [password_confirmation, setPasswordConfirmation] = React.useState<string>("")
-
-	const handleSubmit = (event: React.SyntheticEvent) => {
-		event.preventDefault()
-		sign_up({ variables: { email, password, password_confirmation } })
+	const onSubmit = ({ email, password, passwordConfirmation }) => {
+		sign_up({ variables: { email, password, passwordConfirmation } })
+			.then(() => form.reset())
+			.catch(error => console.error(error))
 	}
 
+	const validate = ({ email, password, passwordConfirmation }) => {
+		const errors: ValidationErrors = {}
+		const isEmailValid = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g)
+		if (!isEmailValid.test(email)) {
+			errors.email = FormErrors.INVALID_EMAIL
+		}
+
+		if (!email) {
+			errors.email = FormErrors.FIELD_REQUIRED
+		}
+
+		if (!password) {
+			errors.password = FormErrors.FIELD_REQUIRED
+		}
+
+		if (!passwordConfirmation) {
+			errors.passwordConfirmation = FormErrors.FIELD_REQUIRED
+		}
+
+		if (password != passwordConfirmation) {
+			errors.passwordConfirmation = FormErrors.PASSWORD_SHOULD_MATCH
+		}
+
+		return errors
+	}
+
+	const { form, handleSubmit, submitting } = useForm({
+		onSubmit,
+		validate
+	})
+
+	const email = useField('email', form)
+	const password = useField('password', form)
+	const passwordConfirmation = useField('passwordConfirmation', form)
+	const rememberMe = useField('rememberMe', form)
+
 	React.useEffect(() => {
-		if (data && data.login) {
-			localStorage.setItem("auth-token", data.login.token)
+		if (data && data.signUp) {
+			localStorage.setItem("auth-token", data.signUp.token)
 			history.push("/")
 		}
 	}, [data])
 
 
-	return <Layout>
-		<Error error={error} />
-		<div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-			<div className="sm:mx-auto sm:w-full sm:max-w-md">
-				<h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-					Create a new Account
-    			</h2>
-				<p className="mt-2 text-center text-sm text-gray-600 max-w">
-					Or <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-						sign in to yours
-					</Link>
-				</p>
-			</div>
+	return <Box bg={mode('gray.50', 'inherit')} minH="100vh" py="12" px={{ sm: '6', lg: '8' }}>
+		<Box maxW={{ sm: 'md' }} mx={{ sm: 'auto' }} w={{ sm: 'full' }}>
+			<Heading mt="6" textAlign="center" size="xl" fontWeight="extrabold">
+				Create a new Account
+			</Heading>
+			<Error error={error} />
+			<Text mt="4" align="center" maxW="md" fontWeight="medium">
+				<span>Already have an account?</span>
+				<Box
+					marginStart="1"
+					color={mode('blue.600', 'blue.200')}
+					_hover={{ color: 'blue.600' }}
+					display={{ base: 'block', sm: 'revert' }}
+					to="/login"
+					as={RouterLink}>
+					sign in to yours
+				</Box>
+			</Text>
 
-			<div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-				<div className="bg-gray-50 py-8 px-4 shadow sm:rounded-lg sm:px-10">
-					<Form action="/sessions/new" method="post" submit={handleSubmit}>
-						<div>
-							<label htmlFor="email" className="block text-sm font-medium text-gray-700">
-								Email address
-        					</label>
-							<div className="mt-1">
-								<input
-									onChange={event => setEmail(event.target.value)}
-									id="email"
-									name="email"
-									type="email"
-									autoComplete="email"
-									required
-									className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-							</div>
-						</div>
+			<Box maxW={{ sm: 'md' }} mx={{ sm: 'auto' }} mt="8" w={{ sm: 'full' }}>
+				<form onSubmit={handleSubmit}>
+					<Stack spacing="6">
+						<FormControl>
+							<FormLabel htmlFor="email">
+								Email Address
+						</FormLabel>
+							<Input {...email.input} />
+							{email.meta.touched && email.meta.error && <FormErrorMessage>{email.meta.error}</FormErrorMessage>}
+						</FormControl>
 
-						<div>
-							<label htmlFor="password" className="block text-sm font-medium text-gray-700">
+						<FormControl>
+							<FormLabel htmlFor="password">
 								Password
-        					</label>
-							<div className="mt-1">
-								<input
-									onChange={event => setPassword(event.target.value)}
-									id="password"
-									name="password"
-									type="password"
-									autoComplete="password"
-									required
-									className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-							</div>
-						</div>
+						</FormLabel>
+							<Input
+								type="password"
+								{...password.input} />
+							{password.meta.touched && password.meta.error && <FormErrorMessage>{password.meta.error}</FormErrorMessage>}
+						</FormControl>
+						<FormControl>
+							<FormLabel htmlFor="passwordConfirmation">
+								Password Confirmation
+						</FormLabel>
+							<Input
+								type="password"
+								{...passwordConfirmation.input} />
+							{passwordConfirmation.meta.touched && passwordConfirmation.meta.error && <FormErrorMessage>{passwordConfirmation.meta.error}</FormErrorMessage>}
+						</FormControl>
+						<Checkbox {...rememberMe.input}>
+							Remember Me
+					</Checkbox>
 
-						<div>
-							<label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-700">
-								Confirmation Password
-        					</label>
-							<div className="mt-1">
-								<input
-									onChange={event => setPasswordConfirmation(event.target.value)}
-									id="password_confirmation"
-									name="password_confirmation"
-									type="password"
-									autoComplete="current-password"
-									required
-									className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-							</div>
-						</div>
-
-						<div className="flex items-center justify-between">
-							<div className="flex items-center">
-								<input id="remember_me" name="remember_me" type="checkbox" className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
-								<label htmlFor="remember_me" className="ml-2 block text-sm text-gray-900">
-									Remember me
-            					</label>
-							</div>
-						</div>
-
-						<div>
-							<button type="submit" disabled={loading} className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-								Sign Up <Loading loading={loading} />
-							</button>
-						</div>
-					</Form>
-
-				</div>
-			</div>
-		</div>
-	</Layout >
+						<Button
+							type="submit"
+							isLoading={isLoading}
+							colorScheme="blue"
+							size="lg"
+							fontSize="md"
+							disabled={submitting}>
+							Sign in
+					</Button>
+					</Stack>
+				</form>
+			</Box>
+		</Box>
+	</Box >
 }

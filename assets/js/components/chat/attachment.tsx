@@ -1,8 +1,7 @@
 import React, { useRef, useEffect } from 'react'
 import ReactTimeAgo from 'react-time-ago'
-import { PanelGroup, Panel } from 'rsuite'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUser } from '@fortawesome/free-solid-svg-icons'
+import { FaUser } from 'react-icons/fa'
+
 import moment from 'moment'
 import 'moment-timezone'
 
@@ -21,7 +20,7 @@ const Attachment: React.FC<Props> = props => {
 
   const date = moment.utc(props.attachment.insertedAt).tz(timezone).toDate()
   return <div className="flex space-x-3 px-6" ref={ref}>
-    <FontAwesomeIcon icon={faUser} className="h-6 w-6 rounded-full" />
+    <FaUser />
     <div className="flex-1 space-y-1">
       <div className="flex items-center justify-between">
         {props.attachment.user ?

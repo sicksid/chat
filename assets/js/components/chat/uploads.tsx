@@ -1,8 +1,6 @@
 import React from 'react'
 import { useMutation } from '@apollo/client'
-import { PanelGroup, Panel } from 'rsuite'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTimes, faUpload, faFileArchive } from '@fortawesome/free-solid-svg-icons'
+import { FaTimes, FaUpload, FaFileArchive } from 'react-icons/fa'
 import Loading from '~/components/loading'
 import CREATE_ATTACHMENT_MUTATION from '~/api/mutations/create_attachment.gql'
 
@@ -35,7 +33,7 @@ const Uploads: React.FC<Props> = props => {
           <div key={index} className="rounded-md p-4 border">
             <div className="flex">
               <div className="flex-shrink-0">
-                <FontAwesomeIcon icon={faFileArchive} className="h-5 w-5" />
+                <FaFileArchive />
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-black">
@@ -46,7 +44,7 @@ const Uploads: React.FC<Props> = props => {
                 <div className="-mx-1.5 -my-1.5">
                   <button onClick={() => props.removeFile(file, index)} className="inline-flex rounded-md p-1.5 text-black hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2">
                     <span className="sr-only">Dismiss</span>
-                    <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
+                    <FaTimes />
                   </button>
                 </div>
               </div>
@@ -57,7 +55,7 @@ const Uploads: React.FC<Props> = props => {
     <div className="px-4 py-3 bg-gray-50 sm:px-6 flex items-center justify-end">
       <button className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         onClick={uploadAttachments}>
-        Send <FontAwesomeIcon icon={faUpload} className="ml-3 -mr-1 h-5 w-5" />
+        Send <FaUpload />
       </button>
     </div>
   </div>

@@ -2,7 +2,7 @@
 
 # Chat
 
-Made with Phoenix, Graphql, Apollo, React, Tailwind, Elixir and Typescript
+Made with Phoenix, Graphql, Apollo, React, Chakra ui, Elixir and Typescript
 
 ## Installation
 

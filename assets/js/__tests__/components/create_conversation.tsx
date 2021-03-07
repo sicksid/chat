@@ -1,23 +1,28 @@
 import React from "react"
-import { render, act, waitFor } from "@testing-library/react"
 import { MockedProvider } from '@apollo/client/testing'
-import SignUp from "~/pages/signup"
+import { render, act, waitFor } from "@testing-library/react"
+import CreateConversation from "~/components/create_conversation"
 
-describe("`<SignUp />`", () => {
-    const mocks = []
+const user: User = {
+    id: "1",
+    email: "fakeemail@gmail.com"
+}
+
+describe("`<CreateConversation />`", () => {
     let component
+    const mocks = []
+
     beforeEach(async () => {
         act(() => {
             component = render(
                 <MockedProvider mocks={mocks} addTypename={false}>
-                    <SignUp />
+                    <CreateConversation user={user} />
                 </MockedProvider>
             )
         })
 
         await waitFor(() => component)
     })
-
     it("renders correctly and matches snapshot", () => {
         expect(component).toMatchSnapshot()
     })

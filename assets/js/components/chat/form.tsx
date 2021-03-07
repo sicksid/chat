@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react'
 import { useMutation } from '@apollo/client'
+import { Button, Box } from '@chakra-ui/react'
 import { useDropzone } from 'react-dropzone'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPaperclip } from '@fortawesome/free-solid-svg-icons'
+import { FaPaperclip } from 'react-icons/fa'
 import { useForm, useField } from 'react-final-form-hooks'
 import Uploads from "./uploads"
 import CREATE_MESSAGE_MUTATION from '~/api/mutations/create_message.gql'
@@ -51,10 +51,10 @@ const Form: React.FC<Props> = (props) => {
   }
 
 
-  return <>
+  return <Box>
     <Uploads files={files} conversation={props.conversation} removeFile={removeFile} />
     <form className="flex-none justify-self-end" onSubmit={handleSubmit}>
-      <div className={`mt-1 flex-auto ${isDragActive && "border-dashed border-4 border-indigo-600"}`} {...getRootProps()}>
+      <Box data-testid="dropzone" {...getRootProps()}>
         {isDragActive && <p className="text-blue">Drop your files here</p>}
         <textarea
           {...content.input}
@@ -62,21 +62,19 @@ const Form: React.FC<Props> = (props) => {
           className="bg-black shadow-sm mt-1 block w-full sm:text-sm"
           placeholder="Write down a message!">
         </textarea>
-      </div>
-      <div className="px-4 py-3 bg-black sm:px-6 flex items-center justify-end space-x-4">
-        <button onClick={openFileBrowser} className="inline-flex items-center p-2 border border-transparent rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-          <FontAwesomeIcon icon={faPaperclip} className="h-6 w-6" />
+      </Box>
+      <Box>
+        <Button onClick={openFileBrowser} >
+          <FaPaperclip />
           <input className="hidden" {...getInputProps()} />
-        </button>
+        </Button>
 
-        <button
-          type="submit"
-          className="bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <Button type="submit">
           Send
-        </button>
-      </div>
+        </Button>
+      </Box>
     </form>
-  </>
+  </Box>
 }
 
 export default Form

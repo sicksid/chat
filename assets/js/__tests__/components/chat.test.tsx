@@ -1,8 +1,8 @@
 import React from "react"
 import { MockedProvider } from '@apollo/client/testing'
-import { mount, ReactWrapper } from "enzyme"
+import { render, act, waitFor } from "@testing-library/react"
 import CREATE_MESSAGE_MUTATION from "~/api/mutations/create_message.gql"
-import Chat from "~/components/chat"
+import Chat, { Form, Uploads } from "~/components/chat"
 
 jest.useFakeTimers()
 
@@ -20,30 +20,57 @@ const mocks = [{
         }
     }
 }]
-let wrapper: ReactWrapper | undefined
 
-beforeEach(() => {
-    wrapper = mount(
-        <MockedProvider mocks={[]} addTypename={false}>
-            <Chat conversation={conversation} />
-        </MockedProvider>
-    )
-})
 describe("`<Chat />`", () => {
+    let component
+
+    beforeEach(async () => {
+        act(() => {
+            component = render(
+                <MockedProvider mocks={[]} addTypename={false}>
+                    <Chat conversation={conversation} />
+                </MockedProvider>
+            )
+        })
+        await waitFor(() => component)
+    })
+
     it("renders correctly and matches snapshot", () => {
-        expect(wrapper).toMatchSnapshot()
+        expect(component).toMatchSnapshot()
     })
 
     it("sends graphql mutation on submit", () => {
-        wrapper = mount(
+        component = render(
             <MockedProvider mocks={mocks} addTypename={false}>
                 <Chat conversation={conversation} />
             </MockedProvider>
         )
-        const textarea = wrapper?.find('textarea')
+        const textarea = component?.find('textarea')
         textarea?.simulate('change', { target: { value: 'Hello' } })
-        const submit = wrapper?.find('button[type="submit"]')
+        const submit = component?.find('button[type="submit"]')
         submit?.simulate('click')
-        expect(wrapper).toMatchSnapshot()
+        expect(component).toMatchSnapshot()
+    })
+
+    it("shows attachments above form when dropping them", () => {
+        const file = new File([
+            JSON.stringify({ ping: true })
+        ], 'img.png', { type: 'image/png' })
+
+        const mockedData = {
+            dataTransfer: {
+                files: [file],
+                items: [{
+                    kind: 'file',
+                    type: file.type,
+                    getAsFile: () => file
+                }],
+                types: ['Files']
+            }
+        }
+
+        const form = component?.find(Form)
+        form?.simulate('drop', mockedData)
+        expect(component?.find(Uploads)).toBeTruthy()
     })
 })

@@ -1,5 +1,5 @@
 import React from "react"
-import { Container, Header, Content, Footer } from "rsuite"
+import { Container } from "@chakra-ui/react"
 import Message from "./message"
 import Attachment from "./attachment"
 import Timeline from "./timeline"
@@ -11,14 +11,21 @@ interface Props {
 }
 
 const Chat: React.FC<Props> = ({ conversation }) => <Container>
-  <Header>
+  {/* <Header>
   </Header>
   <Content>
-    <Timeline conversation={conversation}></Timeline>
-  </Content>
-  <Footer>
-    <Form conversation={conversation}></Form>
-  </Footer>
+  </Content> */}
+  <Timeline conversation={conversation}></Timeline>
+  <Form conversation={conversation}></Form>
+  {/* <Footer>
+  </Footer> */}
 </Container>
 
 export default Chat
+export {
+  Message,
+  Timeline,
+  Uploads,
+  Attachment,
+  Form
+}

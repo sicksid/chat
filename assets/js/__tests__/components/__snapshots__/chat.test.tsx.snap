@@ -7794,6 +7794,7 @@ exports[`\`<Chat />\` renders correctly and matches snapshot 1`] = `
                     >
                       <div
                         className="mt-1 flex-auto false"
+                        data-testid="dropzone"
                         onBlur={null}
                         onClick={[Function]}
                         onDragEnter={[Function]}
@@ -16749,6 +16750,7 @@ exports[`\`<Chat />\` sends graphql mutation on submit 1`] = `
                     >
                       <div
                         className="mt-1 flex-auto false"
+                        data-testid="dropzone"
                         onBlur={null}
                         onClick={[Function]}
                         onDragEnter={[Function]}

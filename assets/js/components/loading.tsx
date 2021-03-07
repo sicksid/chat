@@ -1,6 +1,5 @@
 import React from "react"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FaSpinner } from 'react-icons/fa'
 
 interface LoadingProps {
     message?: string
@@ -8,5 +7,5 @@ interface LoadingProps {
 }
 
 const Loading: React.FC<LoadingProps> = (props) =>
-    props.loading ? <FontAwesomeIcon icon={faSpinner} spin={true} className="text-lg" /> : <></>
+    props.loading ? <FaSpinner /> : <span />
 export default Loading

@@ -1,15 +1,19 @@
 import React from "react"
-import { shallow, ShallowWrapper } from "enzyme"
+import { render, act, waitFor } from "@testing-library/react"
 import Form from "~/components/form"
 
-let wrapper: ShallowWrapper | undefined
-beforeEach(() => {
-    const submitMock = jest.fn()
-    wrapper = shallow(<Form action="/url" method="get" submit={submitMock} />)
-})
+const submitMock = jest.fn()
 
 describe("`<Form />`", () => {
+    let component
+    beforeEach(async () => {
+        act(() => {
+            component = render(<Form action="/url" method="get" submit={submitMock} />)
+        })
+
+        await waitFor(() => component)
+    })
     it("renders correctly and matches snapshot", () => {
-        expect(wrapper).toMatchSnapshot()
+        expect(component).toMatchSnapshot()
     })
 })

@@ -4,8 +4,7 @@
 */
 
 import React from "react"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTimes } from '@fortawesome/free-solid-svg-icons'
+import { FaTimes } from 'react-icons/fa'
 
 // @ts-ignore
 const Error: React.FC<any> = ({ error }) => {
@@ -70,7 +69,7 @@ const Error: React.FC<any> = ({ error }) => {
     return <div className="rounded-md bg-red-50 p-4 fixed">
         <div className="flex">
             <div className="flex-shrink-0">
-                <FontAwesomeIcon icon={faTimes} className="h-5 w-5 text-red-400" />
+                <FaTimes />
             </div>
             <div className="ml-3">
                 <h3 className="text-sm font-medium text-red-800">

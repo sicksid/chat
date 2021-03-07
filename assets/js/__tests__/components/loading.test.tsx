@@ -1,15 +1,19 @@
 import React from "react"
-import { shallow, ShallowWrapper } from "enzyme"
+import { render, act, waitFor } from "@testing-library/react"
 import Loading from "~/components/loading"
 
-let wrapper: ShallowWrapper | undefined
-
-beforeEach(() => {
-    wrapper = shallow(<Loading loading={true} message="Random alert message" />)
-})
-
 describe("`<Loading />`", () => {
+    let component
+
+    beforeEach(async () => {
+        act(() => {
+            component = render(<Loading loading={true} message="Random alert message" />)
+        })
+
+        await waitFor(() => component)
+    })
+
     it("renders correctly and matches snapshot", () => {
-        expect(wrapper).toMatchSnapshot()
+        expect(component).toMatchSnapshot()
     })
 })

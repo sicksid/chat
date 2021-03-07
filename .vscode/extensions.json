@@ -2,7 +2,6 @@
   "recommendations": [
     "esbenp.prettier-vscode",
     "simonguo.rsuite-snippets",
-    "jakebecker.elixir-ls",
-    "bradlc.vscode-tailwindcss"
+    "jakebecker.elixir-ls"
   ]
 }

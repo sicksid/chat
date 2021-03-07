@@ -1,15 +1,20 @@
 import React from "react"
-import { shallow, ShallowWrapper } from "enzyme"
+import { render, act, waitFor } from "@testing-library/react"
 import App from "~/main"
 
-let wrapper: ShallowWrapper | undefined
-
-beforeEach(() => {
-    wrapper = shallow(<App />)
-})
 
 describe("`<App />`", () => {
+    let component
+
+    beforeEach(async () => {
+        act(() => {
+            component = render(<App />)
+        })
+
+        await waitFor(() => component)
+    })
+
     it("renders correctly and matches snapshot", () => {
-        expect(wrapper).toMatchSnapshot()
+        expect(component).toMatchSnapshot()
     })
 })

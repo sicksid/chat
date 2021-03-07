@@ -1,13 +1,25 @@
 import React from 'react'
 import {
-  Link, useHistory
+  Link as RouterLink,
+  useHistory
 } from 'react-router-dom'
+import {
+  useColorModeValue as mode,
+  FormControl,
+  FormErrorMessage,
+  FormLabel, Stack,
+  Box,
+  Input,
+  Checkbox,
+  Button,
+  Text,
+  Heading,
+  Link
+} from '@chakra-ui/react'
 import { useApolloClient, useMutation } from '@apollo/client'
 import { useForm, useField } from 'react-final-form-hooks'
 import LOGIN_MUTATION from '~/api/mutations/login.gql'
-import Layout from '~/shared/layout'
 import Error from '~/components/error'
-import Loading from '~/components/loading'
 
 interface LoginMutation {
   login: {
@@ -16,16 +28,18 @@ interface LoginMutation {
   }
 }
 
-type Required = "Required"
-type InvalidEmail = "Invalid Email"
+enum FormErrors {
+  FIELD_REQUIRED = "Required",
+  INVALID_EMAIL = "Invalid Email"
+}
 
-interface FormErrors {
-  email?: Required | InvalidEmail
-  password?: Required
+interface ValidationErrors {
+  email?: FormErrors.FIELD_REQUIRED | FormErrors.INVALID_EMAIL
+  password?: FormErrors.FIELD_REQUIRED
 }
 
 export default () => {
-  const [login, { error, loading, data }] = useMutation<LoginMutation>(LOGIN_MUTATION)
+  const [login, { error, loading: isLoading, data }] = useMutation<LoginMutation>(LOGIN_MUTATION)
   const history = useHistory()
   const client = useApolloClient()
   const onSubmit = ({ email, password }: User) => {
@@ -33,25 +47,25 @@ export default () => {
   }
 
   const validate = ({ email, password }: User) => {
-    const errors: FormErrors = {}
+    const errors: ValidationErrors = {}
     const isEmailValid = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g)
     if (!isEmailValid.test(email)) {
-      errors.email = "Invalid Email"
+      errors.email = FormErrors.INVALID_EMAIL
     }
 
     if (!email) {
-      errors.email = "Required"
+      errors.email = FormErrors.FIELD_REQUIRED
     }
 
 
     if (!password) {
-      errors.password = "Required"
+      errors.password = FormErrors.FIELD_REQUIRED
     }
 
     return errors
   }
 
-  const { form, handleSubmit, pristine, submitting } = useForm({
+  const { form, handleSubmit, submitting } = useForm({
     onSubmit,
     validate
   })
@@ -68,76 +82,63 @@ export default () => {
     }
   }, [data])
 
-  return <Layout>
-    <Error error={error} />
-    <div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign in to your account
-    			</h2>
-        <p className="mt-2 text-center text-sm text-gray-600 max-w">
-          Or <Link to="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
-            create a new one right here
-					</Link>
-        </p>
-      </div>
+  return <Box bg={mode('gray.50', 'inherit')} minH="100vh" py="12" px={{ sm: '6', lg: '8' }}>
+    <Box maxW={{ sm: 'md' }} mx={{ sm: 'auto' }} w={{ sm: 'full' }}>
+      <Heading mt="6" textAlign="center" size="xl" fontWeight="extrabold">
+        Sign in to your account
+      </Heading>
+      <Text mt="4" align="center" maxW="md" fontWeight="medium">
+        <span>Don&apos;t have an account?</span>
+        <Box
+          marginStart="1"
+          href="#"
+          color={mode('blue.600', 'blue.200')}
+          _hover={{ color: 'blue.600' }}
+          display={{ base: 'block', sm: 'revert' }}
+          to="/sign-up"
+          as={RouterLink}>
+          create a new one right here
+        </Box>
+      </Text>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-gray-50 py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form onSubmit={handleSubmit}>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
-							</label>
-              <div className="mt-1">
-                <input
-                  {...email.input}
-                  type="email"
-                  className={`${email.meta.touched && email.meta.error && "text-red-900 placeholder-red-300"}appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`} />
-                {email.meta.touched && email.meta.error && <p className="mt-2 text-sm text-red-600">{email.meta.error}</p>}
-              </div>
-            </div>
+      <Box maxW={{ sm: 'md' }} mx={{ sm: 'auto' }} mt="8" w={{ sm: 'full' }}>
+        <Error error={error} />
+        <form onSubmit={handleSubmit}>
+          <Stack spacing="6">
+            <FormControl>
+              <FormLabel htmlFor="email">
+                Email Address
+              </FormLabel>
+              <Input {...email.input} />
+              {email.meta.touched && email.meta.error && <FormErrorMessage>{email.meta.error}</FormErrorMessage>}
+            </FormControl>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <FormControl>
+              <FormLabel htmlFor="password">
                 Password
-              </label>
-              <div className="mt-1">
-                <input
-                  {...password.input}
-                  type="password"
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-              </div>
-            </div>
+              </FormLabel>
+              <Input
+                type="password"
+                {...password.input} />
+              {password.meta.touched && password.meta.error && <FormErrorMessage>{password.meta.error}</FormErrorMessage>}
+            </FormControl>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  {...rememberMe.input}
-                  type="checkbox"
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
-                <label htmlFor="remember_me" className="ml-2 block text-sm text-gray-900">
-                  Remember me
-                </label>
-              </div>
-              <div className="text-sm">
-                <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-                  Forgot your password?
-                </a>
-              </div>
-            </div>
+            <Checkbox {...rememberMe.input}>
+              Remember Me
+            </Checkbox>
 
-            <div>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Sign in <Loading loading={loading} />
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </Layout >
+            <Button
+              type="submit"
+              colorScheme="blue"
+              size="lg"
+              fontSize="md"
+              isLoading={isLoading}
+              disabled={submitting}>
+              Sign in
+            </Button>
+          </Stack>
+        </form>
+      </Box>
+    </Box>
+  </Box>
 }

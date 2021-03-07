@@ -120,13 +120,13 @@ tasks:
     desc: Runs tests for frontend
     dir: ./assets
     cmds:
-      - npm test
+      - npm test --inspect-brk --runInBand --coverage false
 
   test.frontend.watch:
     desc: Runs tests in watch mode
     dir: ./assets
     cmds:
-      - npm run test.watch
+      - npm run test.watch --inspect-brk --runInBand --coverage false
 
   test:
     desc: Runs all tests both backend and frontend

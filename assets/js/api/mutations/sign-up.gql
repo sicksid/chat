@@ -1,12 +1,12 @@
 mutation SignUpMutation(
   $email: String!
   $password: String!
-  $password_confirmation: String!
+  $passwordConfirmation: String!
 ) {
   signUp(
     email: $email
     password: $password
-    password_confirmation: $password_confirmation
+    passwordConfirmation: $passwordConfirmation
   ) {
     token
     user {

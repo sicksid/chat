@@ -1,18 +1,24 @@
 import React from "react"
-import { shallow, ShallowWrapper } from "enzyme"
+import { render, act, waitFor } from "@testing-library/react"
 import Home from "~/pages/home"
 
 import { Provider } from 'react-redux'
 import store from '~/store'
-let wrapper: ShallowWrapper | undefined
-beforeEach(() => {
-    wrapper = shallow(<Provider store={store}>
-        <Home />
-    </Provider>)
-})
 
 describe("`<Home />`", () => {
+    let component
+    beforeEach(async () => {
+        act(() => {
+            component = render(
+                <Provider store={store}>
+                    <Home />
+                </Provider>
+            )
+        })
+
+        await waitFor(() => component)
+    })
     it("renders correctly and matches snapshot", () => {
-        expect(wrapper).toMatchSnapshot()
+        expect(component).toMatchSnapshot()
     })
 })
